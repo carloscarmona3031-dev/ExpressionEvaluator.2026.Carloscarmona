@@ -2,9 +2,9 @@ using ExpressionEvaluator.Core;
 
 namespace ExpressionEvaluator.UI.Win
 {
-    public partial class Form1 : Form
+    public partial class CalculatorCode : Form
     {
-        public Form1()
+        public CalculatorCode()
         {
             InitializeComponent();
         }
@@ -106,7 +106,10 @@ namespace ExpressionEvaluator.UI.Win
 
         private void btnErase_Click(object sender, EventArgs e)
         {
-            txtDisplay.Text = txtDisplay.Text.Substring(0, txtDisplay.Text.Length - 1);
+            if (txtDisplay.Text.Length > 0)
+            {
+                txtDisplay.Text = txtDisplay.Text.Substring(0, txtDisplay.Text.Length - 1);
+            }
         }
 
         private void btnDlete_Click(object sender, EventArgs e)

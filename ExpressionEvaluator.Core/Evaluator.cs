@@ -8,14 +8,23 @@ public class Evaluator
         return EvaluatePostfix(postfix);
     }
 
+    //este metodo separa toda la expresion matematica en "tokens" (numeros y operadores)
+    //tambien permite evaluar numeros negativos mirando si el "-" hace parte de una operacion o del resultado como tal
+
     private static List<string> Numberseparator(string infix)
     {
         var separator = new List<string>();
         var number = "";
 
-        foreach (var c in infix)
+        for (int i = 0; i < infix.Length; i++)
         {
+            var c = infix[i];
+
             if (char.IsDigit(c) || c == '.')
+            {
+                number += c;
+            }
+            else if (c == '-' && (i == 0 || "+-*/^(".Contains(infix[i - 1])))
             {
                 number += c;
             }
@@ -38,6 +47,7 @@ public class Evaluator
         return separator;
     }
 
+    //convierte la expresion de infija a posfija
     private static List<string> InfixToPostfix(string infix)
     {
         var separator = Numberseparator(infix);
@@ -76,7 +86,7 @@ public class Evaluator
         return output;
             
     }
-
+    //estos metodos fueron cambiados para que ya no evaluaran las expresiones individiales en "char" si no en grupos o "tokens" "String"
     private static int PriorityStack(string item) => item switch
     {
         "^" => 3,
@@ -87,18 +97,18 @@ public class Evaluator
         "(" => 0,
         _ => throw new Exception("Sintax error."),
     };
-
+    
     private static int PriorityInfix(string item) => item switch
     {
-        '^' => 4,
-        '*' => 2,
-        '/' => 2,
-        '+' => 1,
-        '-' => 1,
-        '(' => 5,
+        "^" => 4,
+        "*" => 2,
+        "/" => 2,
+        "+" => 1,
+        "-" => 1,
+        "(" => 5,
         _ => throw new Exception("Sintax error."),
     };
-
+    //evalua la expresion en notacion posfija, haciendo los calculos y sacando o añadiendo al stack
     private static double EvaluatePostfix(List<string> postfix)
     {
         var stack = new Stack<double>();
@@ -127,7 +137,7 @@ public class Evaluator
 
         return stack.Pop();   
     }
-
+    //este determina si un grupo o "token" es operador o no
     private static bool IsOperator(string item)
     {
         return item.Length == 1 && "+-*/^()".Contains(item);

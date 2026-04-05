@@ -1,6 +1,6 @@
 ﻿namespace ExpressionEvaluator.UI.Win
 {
-    partial class Form1
+    partial class CalculatorCode
     {
         /// <summary>
         ///  Required designer variable.
@@ -324,7 +324,7 @@
             btnErase.UseVisualStyleBackColor = false;
             btnErase.Click += btnErase_Click;
             // 
-            // Form1
+            // CalculatorCode
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -352,8 +352,8 @@
             Controls.Add(btn8);
             Controls.Add(txtDisplay);
             Controls.Add(btn7);
-            Name = "Form1";
-            Text = "Form1";
+            Name = "CalculatorCode";
+            Text = "Expresion Evaluator";
             ResumeLayout(false);
             PerformLayout();
         }
