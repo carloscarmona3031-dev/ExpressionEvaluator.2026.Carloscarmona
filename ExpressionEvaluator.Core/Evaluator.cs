@@ -8,66 +8,87 @@ public class Evaluator
         return EvaluatePostfix(postfix);
     }
 
-    private static string InfixToPostfix(string infix)
+    private static List<string> Numberseparator(string infix)
     {
-        var postFix = string.Empty;
-        var stack = new Stack<char>();
-        foreach (var item in infix)
+        var separator = new List<string>();
+        var number = "";
+
+        foreach (var c in infix)
         {
-            if (IsOperator(item))
+            if (char.IsDigit(c) || c == '.')
             {
-                if (stack.Count == 0)
-                {
-                    stack.Push(item);
-                }
-                else
-                {
-                    if (item == ')')
-                    {
-                        do
-                        {
-                            postFix += stack.Pop();
-                        } while (stack.Peek() != '(');
-                        stack.Pop();
-                    }
-                    else
-                    {
-                        if (PriorityInfix(item) > PriorityStack(stack.Peek()))
-                        {
-                            stack.Push(item);
-                        }
-                        else
-                        {
-                            postFix += stack.Pop();
-                            stack.Push(item);
-                        }
-                    }
-                }
+                number += c;
             }
             else
             {
-                postFix += item;
+                if (!string.IsNullOrEmpty(number))
+                {
+                    separator.Add(number);
+                    number = "";
+                }
+
+                if (!char.IsWhiteSpace(c))
+                    separator.Add(c.ToString());
             }
         }
-        while (stack.Count > 0)
-        {
-            postFix += stack.Pop();
-        }
-        return postFix;
+
+        if (!string.IsNullOrEmpty(number))
+            separator.Add(number);
+
+        return separator;
     }
 
-    private static int PriorityStack(char item) => item switch
+    private static List<string> InfixToPostfix(string infix)
     {
-        '^' => 3,
-        '*' => 2,
-        '/' => 2,
-        '+' => 1,
-        '-' => 1,
-        '(' => 0,
+        var separator = Numberseparator(infix);
+        var output = new List<string>();
+        var stack = new Stack<string>();
+
+        foreach (var separate in separator)
+        {
+            if (!IsOperator(separate))
+            {
+                output.Add(separate);
+            }
+            else if (separate == "(")
+            {
+                stack.Push(separate);
+            }
+            else if (separate == ")")
+            {
+                while (stack.Peek() != "(") output.Add(stack.Pop());
+                stack.Pop();
+            }
+            else
+            {
+                while (stack.Count > 0 && 
+                    PriorityStack(stack.Peek()) >= PriorityInfix(separate)) 
+                {
+                    output.Add(stack.Pop());
+                }
+                stack.Push(separate);
+            }
+        }
+
+        while (stack.Count > 0) 
+            output.Add(stack.Pop());
+
+        return output;
+            
+    }
+
+    private static int PriorityStack(string item) => item switch
+    {
+        "^" => 3,
+        "*" => 2,
+        "/" => 2,
+        "+" => 1,
+        "-" => 1,
+        "(" => 0,
         _ => throw new Exception("Sintax error."),
     };
 
-    private static int PriorityInfix(char item) => item switch
+    private static int PriorityInfix(string item) => item switch
     {
         '^' => 4,
         '*' => 2,
@@ -78,32 +99,37 @@ public class Evaluator
         _ => throw new Exception("Sintax error."),
     };
 
-    private static double EvaluatePostfix(string postfix)
+    private static double EvaluatePostfix(List<string> postfix)
     {
         var stack = new Stack<double>();
-        foreach (char item in postfix)
+
+        foreach (var separate in postfix)
         {
-            if (IsOperator(item))
+            if (!IsOperator(separate))
             {
-                var b = stack.Pop();
-                var a = stack.Pop();
-                stack.Push(item switch
-                {
-                    '+' => a + b,
-                    '-' => a - b,
-                    '*' => a * b,
-                    '/' => a / b,
-                    '^' => Math.Pow(a, b),
-                    _ => throw new Exception("Sintax error."),
-                });
+                stack.Push(double.Parse(separate));
             }
             else
             {
-                stack.Push(double.Parse(item.ToString()));
+                var b = stack.Pop();
+                var a = stack.Pop();
+
+                stack.Push(separate switch
+                {
+                    "+" => a + b,
+                    "-" => a - b,
+                    "*" => a * b,
+                    "/" => a / b,
+                    "^" => Math.Pow(a, b),_ => throw new Exception("Sintax error.")
+                });
             }
         }
-        return stack.Pop();
+
+        return stack.Pop();   
     }
 
-    private static bool IsOperator(char item) => "+-*/^()".Contains(item);
+    private static bool IsOperator(string item)
+    {
+        return item.Length == 1 && "+-*/^()".Contains(item);
+    } 
 }
